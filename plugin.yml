@@ -12,7 +12,7 @@ inputs:
   name: runners_label
 
 - label: "Custom IAM Permissions?"
-  type: boolean
+  type: bool
   name: custom_iam
 
 - label: "Custom Policy (e.g. StacksPotContainerPolicy):"
