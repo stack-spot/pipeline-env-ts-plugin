@@ -1,0 +1,143 @@
+name: Deploy ECS CDK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  lint:
+    name: Lint
+    runs-on: [ {{ runners_label }} ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          cache: "npm"
+      - name: npm dependencies
+        run: npm install
+      - name: Run build
+        run: npm run build
+      - name: Run lint
+        run: npm run lint -- --no-color
+
+  build:
+    name: Build
+    needs: lint
+    runs-on: [ {{ runners_label }} ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          cache: "npm"
+      - name: npm dependencies
+        run: npm install
+      - name: Run npm build
+        run: npm run build
+
+  test:
+    name: Test
+    needs: build
+    runs-on: [ {{ runners_label }} ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          cache: "npm"
+      - name: npm dependencies
+        run: npm install
+      - name: Run test
+        run: npm run test
+        {% raw %}
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_TARGET_ACCOUNT: ${{ secrets.AWS_TARGET_ACCOUNT }}
+        {% endraw %}
+
+  synth:
+    name: Synth CDK
+    needs: test
+    runs-on: [ {{ runners_label }} ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          cache: "npm"
+      - name: Install CDK and dependencies
+        run: |
+          npm install && npm install -g aws-cdk
+      - name: Run Synth
+        run: |
+          cdk synth
+        {% raw %}
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_TARGET_ACCOUNT: ${{ secrets.AWS_TARGET_ACCOUNT }}
+        {% endraw %}
+
+  bootstrap:
+    name: CDK Bootstrap
+    needs: [synth]
+    runs-on: [ {{ runners_label }} ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          cache: "npm"
+      - name: npm dependencies
+        run: npm install && npm install -g aws-cdk
+      - name: Run Bootstrap
+        {% if inputs.custom_iam %}
+        run: |
+          cdk bootstrap --public-access-block-configuration false --cloudformation-execution-policies arn:aws:iam::$AWS_REGION:policy/{{ inputs.custom_policy }}
+        {% else %}
+        run: |
+          cdk bootstrap --public-access-block-configuration false --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess
+        {% endif %}
+        if: github.ref == 'refs/heads/main'
+        {% raw %}
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_TARGET_ACCOUNT: ${{ secrets.AWS_TARGET_ACCOUNT }}
+        {% endraw %}
+
+  deploy:
+    name: Deploy CDK
+    needs: [bootstrap]
+    runs-on: [ {{ runners_label }} ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          cache: "npm"
+      - name: npm dependencies
+        run: npm install && npm install -g aws-cdk
+      - name: Deploy
+        run: |
+          cdk deploy --require-approval never "*"
+        if: github.ref == 'refs/heads/main'
+        {% raw %}
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_TARGET_ACCOUNT: ${{ secrets.AWS_TARGET_ACCOUNT }}
+        {% endraw %}
+
