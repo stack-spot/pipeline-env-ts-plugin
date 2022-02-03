@@ -105,10 +105,10 @@ jobs:
       - name: Run Bootstrap
         {% if inputs.custom_iam %}
         run: |
-          cdk bootstrap --public-access-block-configuration false --cloudformation-execution-policies arn:aws:iam::$AWS_REGION:policy/{{ inputs.custom_policy }}
+          cdk bootstrap --public-access-block-configuration false --termination-protection --cloudformation-execution-policies arn:aws:iam::$AWS_REGION:policy/{{ inputs.custom_policy }}
         {% else %}
         run: |
-          cdk bootstrap --public-access-block-configuration false --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess
+          cdk bootstrap --public-access-block-configuration false --termination-protection --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess
         {% endif %}
         if: github.ref == 'refs/heads/main'
         {% raw %}
