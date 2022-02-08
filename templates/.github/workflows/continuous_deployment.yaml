@@ -1,4 +1,4 @@
-name: Deploy ECS CDK
+name: Deploy CDK Project
 
 on:
   push:
@@ -11,53 +11,53 @@ jobs:
     name: Lint
     runs-on: [ {{ runners_label }} ]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16"
-          cache: "npm"
-      - name: npm dependencies
-        run: npm install
-      - name: Run build
-        run: npm run build
-      - name: Run lint
-        run: npm run lint -- --no-color
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#      - name: Node.js
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: "16"
+#          cache: "npm"
+#      - name: npm dependencies
+#        run: npm install
+#      - name: Run build
+#        run: npm run build
+#      - name: Run lint
+#        run: npm run lint -- --no-color
 
   build:
     name: Build
     needs: lint
     runs-on: [ {{ runners_label }} ]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16"
-          cache: "npm"
-      - name: npm dependencies
-        run: npm install
-      - name: Run npm build
-        run: npm run build
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#      - name: Node.js
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: "16"
+#          cache: "npm"
+#      - name: npm dependencies
+#        run: npm install
+#      - name: Run npm build
+#        run: npm run build
 
   test:
     name: Test
     needs: build
     runs-on: [ {{ runners_label }} ]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16"
-          cache: "npm"
-      - name: npm dependencies
-        run: npm install
-      - name: Run test
-        run: npm run test
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#      - name: Node.js
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: "16"
+#          cache: "npm"
+#      - name: npm dependencies
+#        run: npm install
+#      - name: Run test
+#        run: npm run test
         {% raw %}
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}

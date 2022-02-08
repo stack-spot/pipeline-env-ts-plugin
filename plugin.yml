@@ -1,4 +1,4 @@
-name: pipeline-env-ts-plugin
+name: pipeline-env-cs-plugin
 description: Plugin to create a github pipeline.
 types:
 - env
