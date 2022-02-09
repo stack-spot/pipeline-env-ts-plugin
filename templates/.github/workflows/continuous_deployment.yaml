@@ -1,4 +1,4 @@
-name: Deploy CDK Project
+name: Deploy ECS CDK
 
 on:
   push:
@@ -6,58 +6,57 @@ on:
       - main
 
 jobs:
-
   lint:
     name: Lint
     runs-on: [ {{ runners_label }} ]
     steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#      - name: Node.js
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: "16"
-#          cache: "npm"
-#      - name: npm dependencies
-#        run: npm install
-#      - name: Run build
-#        run: npm run build
-#      - name: Run lint
-#        run: npm run lint -- --no-color
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+      - name: npm dependencies
+        run: npm install
+      - name: Run build
+        run: npm run build
+      - name: Run lint
+        run: npm run lint -- --no-color
 
   build:
     name: Build
     needs: lint
     runs-on: [ {{ runners_label }} ]
     steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#      - name: Node.js
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: "16"
-#          cache: "npm"
-#      - name: npm dependencies
-#        run: npm install
-#      - name: Run npm build
-#        run: npm run build
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+      - name: npm dependencies
+        run: npm install
+      - name: Run npm build
+        run: npm run build
 
   test:
     name: Test
     needs: build
     runs-on: [ {{ runners_label }} ]
     steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#      - name: Node.js
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: "16"
-#          cache: "npm"
-#      - name: npm dependencies
-#        run: npm install
-#      - name: Run test
-#        run: npm run test
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+      - name: npm dependencies
+        run: npm install
+      - name: Run test
+        run: npm run test
         {% raw %}
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -74,8 +73,8 @@ jobs:
       - name: Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
-          cache: "npm"
+          node-version: '16'
+          cache: 'npm'
       - name: Install CDK and dependencies
         run: |
           npm install && npm install -g aws-cdk
@@ -98,8 +97,8 @@ jobs:
       - name: Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
-          cache: "npm"
+          node-version: '16'
+          cache: 'npm'
       - name: npm dependencies
         run: npm install && npm install -g aws-cdk
       - name: Run Bootstrap
@@ -127,17 +126,16 @@ jobs:
       - name: Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
-          cache: "npm"
+          node-version: '16'
+          cache: 'npm'
       - name: npm dependencies
         run: npm install && npm install -g aws-cdk
       - name: Deploy
         run: |
-          cdk deploy --require-approval never "*"
+          cdk deploy --require-approval never '*'
         if: github.ref == 'refs/heads/main'
         {% raw %}
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_TARGET_ACCOUNT: ${{ secrets.AWS_TARGET_ACCOUNT }}
         {% endraw %}
-
